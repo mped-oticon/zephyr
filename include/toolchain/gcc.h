@@ -325,7 +325,7 @@ A##a:
 
 #define GEN_ABS_SYM_END }
 
-#if defined(CONFIG_ARM)
+//#if defined(CONFIG_ARM)
 
 /*
  * GNU/ARM backend does not have a proper operand modifier which does not
@@ -335,6 +335,7 @@ A##a:
  * to output (value) in the ARM specific GEN_OFFSET macro.
  */
 
+/*
 #define GEN_ABSOLUTE_SYM(name, value)               \
 	__asm__(".globl\t" #name "\n\t.equ\t" #name \
 		",%B0"                              \
@@ -348,12 +349,13 @@ A##a:
 		"\n\t.type\t" #name ",@object" :  : "n"(value))
 
 #elif defined(CONFIG_NIOS2) || defined(CONFIG_RISCV32) || defined(CONFIG_XTENSA)
+*/
 
-/* No special prefixes necessary for constants in this arch AFAICT */
 #define GEN_ABSOLUTE_SYM(name, value)		\
 	__asm__(".globl\t" #name "\n\t.equ\t" #name \
 		",%0"                              \
 		"\n\t.type\t" #name ",%%object" :  : "n"(value))
+/*
 
 #elif defined(CONFIG_ARCH_POSIX)
 #define GEN_ABSOLUTE_SYM(name, value)               \
@@ -363,6 +365,8 @@ A##a:
 #else
 #error processor architecture not supported
 #endif
+*/
+
 
 #define compiler_barrier() do { \
 	__asm__ __volatile__ ("" ::: "memory"); \
