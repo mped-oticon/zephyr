@@ -883,7 +883,7 @@ toolchain_ld_configure_files()
 
 toolchain_ld_userspace2()
 
-toolchain_ld_prebuilt()
+toolchain_ld_prebuilt_link()
 
 set(generated_kernel_files ${GKSF} ${GKOF})
 if(NOT generated_kernel_files)
