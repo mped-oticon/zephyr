@@ -30,7 +30,8 @@ check_c_compiler_flag("" toolchain_is_ok)
 assert(toolchain_is_ok "The toolchain is unable to build a dummy C file. See CMakeError.log.")
 
 set(CMAKE_EXECUTABLE_SUFFIX .elf)
-set(ZEPHYR_PREBUILT_EXECUTABLE zephyr_prebuilt)
+set(ZEPHYR_PREBUILT_EXECUTABLE zephyr_prebuilt) # Binary from 1st linker pass
+set(ZEPHYR_FINAL_EXECUTABLE    zephyr_final)    # Binary from 2nd linker pass (if applicable)
 
 # Set some phony targets to collect dependencies
 set(OFFSETS_H_TARGET           offsets_h)
@@ -920,10 +921,9 @@ if(NOT generated_kernel_files)
   # generation stage.
   set(logical_target_for_zephyr_elf ${ZEPHYR_PREBUILT_EXECUTABLE})
 else()
-  set(KERNEL_ELF kernel_elf)
-  set(logical_target_for_zephyr_elf ${KERNEL_ELF})
-
   toolchain_ld_final()
+
+  set(logical_target_for_zephyr_elf ${ZEPHYR_FINAL_EXECUTABLE})
 endif()
 
 # Export the variable to the application's scope to allow the

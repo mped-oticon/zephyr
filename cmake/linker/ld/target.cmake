@@ -212,10 +212,10 @@ macro(toolchain_ld_final)
     ${ZEPHYR_INCLUDE_DIRS}
   )
 
-  add_executable(       ${KERNEL_ELF} misc/empty_file.c ${GKSF})
-  target_link_libraries(${KERNEL_ELF} ${GKOF} ${TOPT} ${PROJECT_BINARY_DIR}/linker_pass_final.cmd ${zephyr_lnk} ${CODE_RELOCATION_DEP})
-  set_property(TARGET   ${KERNEL_ELF} PROPERTY LINK_DEPENDS ${PROJECT_BINARY_DIR}/linker_pass_final.cmd)
-  add_dependencies(     ${KERNEL_ELF} ${PRIV_STACK_DEP} ${LINKER_PASS_FINAL_SCRIPT_TARGET})
+  add_executable(       ${ZEPHYR_FINAL_EXECUTABLE} misc/empty_file.c ${GKSF})
+  target_link_libraries(${ZEPHYR_FINAL_EXECUTABLE} ${GKOF} ${TOPT} ${PROJECT_BINARY_DIR}/linker_pass_final.cmd ${zephyr_lnk} ${CODE_RELOCATION_DEP})
+  set_property(TARGET   ${ZEPHYR_FINAL_EXECUTABLE} PROPERTY LINK_DEPENDS ${PROJECT_BINARY_DIR}/linker_pass_final.cmd)
+  add_dependencies(     ${ZEPHYR_FINAL_EXECUTABLE} ${PRIV_STACK_DEP} ${LINKER_PASS_FINAL_SCRIPT_TARGET})
 endmacro()
 
 
