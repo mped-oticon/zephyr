@@ -376,10 +376,6 @@ if(CONFIG_USERSPACE)
   endif()
 endif()
 
-get_property(TOPT GLOBAL PROPERTY TOPT)
-set_ifndef(  TOPT -Wl,-T) # clang doesn't pick -T for some reason and complains,
-                          # while -Wl,-T works for both, gcc and clang
-
 if(CONFIG_HAVE_CUSTOM_LINKER_SCRIPT)
   set(LINKER_SCRIPT ${APPLICATION_SOURCE_DIR}/${CONFIG_CUSTOM_LINKER_SCRIPT})
   if(NOT EXISTS ${LINKER_SCRIPT})

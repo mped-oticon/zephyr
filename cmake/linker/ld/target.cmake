@@ -4,6 +4,10 @@ find_program(CMAKE_LINKER     ${CROSS_COMPILE}ld      PATH ${TOOLCHAIN_HOME} NO_
 
 set_ifndef(LINKERFLAGPREFIX -Wl)
 
+# ld -T scriptfile: Use scriptfile as the linker script
+get_property(TOPT GLOBAL PROPERTY TOPT)
+set_ifndef(  TOPT -T)
+
 
 # Run $LINKER_SCRIPT file through the C preprocessor, producing ${linker_script_gen}
 # NOTE: ${linker_script_gen} will be produced at build-time; not at configure-time
@@ -178,5 +182,5 @@ include(${ZEPHYR_BASE}/cmake/linker/${LINKER}/target_base.cmake)
 include(${ZEPHYR_BASE}/cmake/linker/${LINKER}/target_baremetal.cmake)
 include(${ZEPHYR_BASE}/cmake/linker/${LINKER}/target_cpp.cmake)
 include(${ZEPHYR_BASE}/cmake/linker/${LINKER}/target_relocation.cmake)
-include(${ZEPHYR_BASE}/cmake/linker/${LINKER}/target_configure.cmake)
 include(${ZEPHYR_BASE}/cmake/linker/${LINKER}/target_userspace.cmake)
+include(${ZEPHYR_BASE}/cmake/linker/${LINKER}/target_configure.cmake)
