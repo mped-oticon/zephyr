@@ -667,6 +667,19 @@ if (CONFIG_CODE_DATA_RELOCATION)
   set(CODE_RELOCATION_DEP code_relocation_source_lib)
 endif() # CONFIG_CODE_DATA_RELOCATION
 
+set(zephyr_lnk
+  ${LINKERFLAGPREFIX},-Map=${PROJECT_BINARY_DIR}/${KERNEL_MAP_NAME}
+  -u_OffsetAbsSyms
+  -u_ConfigAbsSyms
+  ${LINKERFLAGPREFIX},--whole-archive
+  ${ZEPHYR_LIBS_PROPERTY}
+  ${LINKERFLAGPREFIX},--no-whole-archive
+  kernel
+  $<TARGET_OBJECTS:${OFFSETS_LIB}>
+  ${LIB_INCLUDE_DIR}
+  -L${PROJECT_BINARY_DIR}
+  ${TOOLCHAIN_LIBS}
+  )
 configure_linker_script(
   linker.cmd
   ""
@@ -695,19 +708,7 @@ set_property(TARGET
   ${ZEPHYR_INCLUDE_DIRS}
   )
 
-set(zephyr_lnk
-  ${LINKERFLAGPREFIX},-Map=${PROJECT_BINARY_DIR}/${KERNEL_MAP_NAME}
-  -u_OffsetAbsSyms
-  -u_ConfigAbsSyms
-  ${LINKERFLAGPREFIX},--whole-archive
-  ${ZEPHYR_LIBS_PROPERTY}
-  ${LINKERFLAGPREFIX},--no-whole-archive
-  kernel
-  $<TARGET_OBJECTS:${OFFSETS_LIB}>
-  ${LIB_INCLUDE_DIR}
-  -L${PROJECT_BINARY_DIR}
-  ${TOOLCHAIN_LIBS}
-  )
+
 
 if(CONFIG_GEN_ISR_TABLES)
   if(CONFIG_GEN_SW_ISR_TABLE)
