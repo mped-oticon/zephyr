@@ -891,7 +891,8 @@ if(NOT generated_kernel_files)
   # generation stage.
   set(logical_target_for_zephyr_elf ${ZEPHYR_PREBUILT_EXECUTABLE})
 else()
-  toolchain_ld_final()
+  toolchain_ld_final_configure()
+  toolchain_ld_final_link()
 
   set(logical_target_for_zephyr_elf ${ZEPHYR_FINAL_EXECUTABLE})
 endif()

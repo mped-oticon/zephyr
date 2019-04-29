@@ -217,7 +217,7 @@ macro(toolchain_ld_prebuilt_link)
 endmacro()
 
 
-macro(toolchain_ld_final)
+macro(toolchain_ld_final_configure)
   # The second linker pass uses the same source linker script of the
   # first pass (LINKER_SCRIPT), but this time with a different output
   # file and preprocessed with the define LINKER_PASS2.
@@ -241,7 +241,9 @@ macro(toolchain_ld_final)
     PROPERTY INCLUDE_DIRECTORIES
     ${ZEPHYR_INCLUDE_DIRS}
   )
+endmacro()
 
+macro(toolchain_ld_final_link)
   add_executable(       ${ZEPHYR_FINAL_EXECUTABLE} misc/empty_file.c ${GKSF})
   target_link_libraries(${ZEPHYR_FINAL_EXECUTABLE} ${GKOF} ${TOPT} ${PROJECT_BINARY_DIR}/linker_pass_final.cmd ${zephyr_lnk} ${CODE_RELOCATION_DEP})
   set_property(TARGET   ${ZEPHYR_FINAL_EXECUTABLE} PROPERTY LINK_DEPENDS ${PROJECT_BINARY_DIR}/linker_pass_final.cmd)
