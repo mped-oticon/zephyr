@@ -9,6 +9,23 @@ get_property(TOPT GLOBAL PROPERTY TOPT)
 set_ifndef(  TOPT -T)
 
 
+macro(toolchain_ld_set_zephyr_lnk)
+  set(zephyr_lnk
+    ${LINKERFLAGPREFIX},-Map=${PROJECT_BINARY_DIR}/${KERNEL_MAP_NAME}
+    -u_OffsetAbsSyms
+    -u_ConfigAbsSyms
+    ${LINKERFLAGPREFIX},--whole-archive
+    ${ZEPHYR_LIBS_PROPERTY}
+    ${LINKERFLAGPREFIX},--no-whole-archive
+    kernel
+    $<TARGET_OBJECTS:${OFFSETS_LIB}>
+    ${LIB_INCLUDE_DIR}
+    -L${PROJECT_BINARY_DIR}
+    ${TOOLCHAIN_LIBS}
+    )
+endmacro()
+
+
 # Run $LINKER_SCRIPT file through the C preprocessor, producing ${linker_script_gen}
 # NOTE: ${linker_script_gen} will be produced at build-time; not at configure-time
 macro(configure_linker_script linker_script_gen linker_pass_define)
