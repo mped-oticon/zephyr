@@ -680,34 +680,8 @@ set(zephyr_lnk
   -L${PROJECT_BINARY_DIR}
   ${TOOLCHAIN_LIBS}
   )
-configure_linker_script(
-  linker.cmd
-  ""
-  ${PRIV_STACK_DEP}
-  ${APP_SMEM_ALIGNED_DEP}
-  ${CODE_RELOCATION_DEP}
-  ${OFFSETS_H_TARGET}
-  )
 
-add_custom_target(
-  ${LINKER_SCRIPT_TARGET}
-  DEPENDS
-  linker.cmd
-  )
-
-# Give the '${LINKER_SCRIPT_TARGET}' target all of the include directories so
-# that cmake can successfully find the linker_script's header
-# dependencies.
-zephyr_get_include_directories_for_lang(C
-  ZEPHYR_INCLUDE_DIRS
-  STRIP_PREFIX # Don't use a -I prefix
-  )
-set_property(TARGET
-  ${LINKER_SCRIPT_TARGET}
-  PROPERTY INCLUDE_DIRECTORIES
-  ${ZEPHYR_INCLUDE_DIRS}
-  )
-
+toolchain_ld_prebuilt_configure()
 
 
 if(CONFIG_GEN_ISR_TABLES)
