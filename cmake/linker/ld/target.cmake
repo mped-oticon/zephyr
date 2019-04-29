@@ -177,6 +177,48 @@ endmacro()
 
 
 
+macro(toolchain_ld_prebuilt)
+  ##CONSIDER
+  # FIXME: Is there any way to get rid of empty_file.c?
+  add_executable(       ${ZEPHYR_PREBUILT_EXECUTABLE} misc/empty_file.c)
+  target_link_libraries(${ZEPHYR_PREBUILT_EXECUTABLE} ${TOPT} ${PROJECT_BINARY_DIR}/linker.cmd ${PRIV_STACK_LIB} ${zephyr_lnk} ${CODE_RELOCATION_DEP})
+  set_property(TARGET   ${ZEPHYR_PREBUILT_EXECUTABLE} PROPERTY LINK_DEPENDS ${PROJECT_BINARY_DIR}/linker.cmd)
+  add_dependencies(     ${ZEPHYR_PREBUILT_EXECUTABLE} ${PRIV_STACK_DEP} ${LINKER_SCRIPT_TARGET} ${OFFSETS_LIB})
+endmacro()
+
+
+macro(toolchain_ld_final)
+  # The second linker pass uses the same source linker script of the
+  # first pass (LINKER_SCRIPT), but this time with a different output
+  # file and preprocessed with the define LINKER_PASS2.
+  configure_linker_script(
+    linker_pass_final.cmd
+    "-DLINKER_PASS2"
+    ${PRIV_STACK_DEP}
+    ${CODE_RELOCATION_DEP}
+    ${ZEPHYR_PREBUILT_EXECUTABLE}
+    ${OFFSETS_H_TARGET}
+    )
+
+  set(LINKER_PASS_FINAL_SCRIPT_TARGET linker_pass_final_script_target)
+  add_custom_target(
+    ${LINKER_PASS_FINAL_SCRIPT_TARGET}
+    DEPENDS
+    linker_pass_final.cmd
+    )
+  set_property(TARGET
+    ${LINKER_PASS_FINAL_SCRIPT_TARGET}
+    PROPERTY INCLUDE_DIRECTORIES
+    ${ZEPHYR_INCLUDE_DIRS}
+  )
+
+  add_executable(       ${KERNEL_ELF} misc/empty_file.c ${GKSF})
+  target_link_libraries(${KERNEL_ELF} ${GKOF} ${TOPT} ${PROJECT_BINARY_DIR}/linker_pass_final.cmd ${zephyr_lnk} ${CODE_RELOCATION_DEP})
+  set_property(TARGET   ${KERNEL_ELF} PROPERTY LINK_DEPENDS ${PROJECT_BINARY_DIR}/linker_pass_final.cmd)
+  add_dependencies(     ${KERNEL_ELF} ${PRIV_STACK_DEP} ${LINKER_PASS_FINAL_SCRIPT_TARGET})
+endmacro()
+
+
 # Load toolchain_ld-family macros
 include(${ZEPHYR_BASE}/cmake/linker/${LINKER}/target_base.cmake)
 include(${ZEPHYR_BASE}/cmake/linker/${LINKER}/target_baremetal.cmake)
