@@ -53,6 +53,126 @@ macro(configure_linker_script linker_script_gen linker_pass_define)
 endmacro()
 
 
+
+
+macro(toolchain_ld_userspace2)
+  ##CONSIDER
+  if(CONFIG_USERSPACE)
+    set(APP_SMEM_ALIGNED_LD "${PROJECT_BINARY_DIR}/include/generated/app_smem_aligned.ld")
+    set(APP_SMEM_UNALIGNED_LD "${PROJECT_BINARY_DIR}/include/generated/app_smem_unaligned.ld")
+    set(OBJ_FILE_DIR "${PROJECT_BINARY_DIR}/../")
+
+    add_custom_target(
+      ${APP_SMEM_ALIGNED_DEP}
+      DEPENDS
+      ${APP_SMEM_ALIGNED_LD}
+      )
+
+    add_custom_target(
+      ${APP_SMEM_UNALIGNED_DEP}
+      DEPENDS
+      ${APP_SMEM_UNALIGNED_LD}
+      )
+
+    if(CONFIG_NEWLIB_LIBC)
+      set(NEWLIB_PART -l libc.a z_libc_partition)
+    endif()
+    if(CONFIG_MBEDTLS)
+      set(MBEDTLS_PART -l libext__lib__crypto__mbedtls.a k_mbedtls_partition)
+    endif()
+
+    add_custom_command(
+      OUTPUT ${APP_SMEM_UNALIGNED_LD}
+      COMMAND ${PYTHON_EXECUTABLE}
+      ${ZEPHYR_BASE}/scripts/gen_app_partitions.py
+      -d ${OBJ_FILE_DIR}
+      -o ${APP_SMEM_UNALIGNED_LD}
+      ${NEWLIB_PART} ${MBEDTLS_PART}
+      $<$<BOOL:${CMAKE_VERBOSE_MAKEFILE}>:--verbose>
+      DEPENDS
+      kernel
+      ${ZEPHYR_LIBS_PROPERTY}
+      WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/
+      COMMENT "Generating app_smem_unaligned linker section"
+      )
+
+    configure_linker_script(
+      linker_app_smem_unaligned.cmd
+      "-DLINKER_APP_SMEM_UNALIGNED"
+      ${CODE_RELOCATION_DEP}
+      ${APP_SMEM_UNALIGNED_DEP}
+      ${APP_SMEM_UNALIGNED_LD}
+      ${OFFSETS_H_TARGET}
+      )
+
+    add_custom_target(
+      linker_app_smem_unaligned_script
+      DEPENDS
+      linker_app_smem_unaligned.cmd
+      )
+
+    set_property(TARGET
+      linker_app_smem_unaligned_script
+      PROPERTY INCLUDE_DIRECTORIES
+      ${ZEPHYR_INCLUDE_DIRS}
+      )
+
+    set(APP_SMEM_UNALIGNED_LIB app_smem_unaligned_output_obj_renamed_lib)
+    add_executable(       app_smem_unaligned_prebuilt misc/empty_file.c)
+    target_link_libraries(app_smem_unaligned_prebuilt ${TOPT} ${PROJECT_BINARY_DIR}/linker_app_smem_unaligned.cmd ${zephyr_lnk} ${CODE_RELOCATION_DEP})
+    set_property(TARGET   app_smem_unaligned_prebuilt PROPERTY LINK_DEPENDS ${PROJECT_BINARY_DIR}/linker_app_smem_unaligned.cmd)
+    add_dependencies(     app_smem_unaligned_prebuilt linker_app_smem_unaligned_script ${OFFSETS_LIB})
+
+    add_custom_command(
+      OUTPUT ${APP_SMEM_ALIGNED_LD}
+      COMMAND ${PYTHON_EXECUTABLE}
+      ${ZEPHYR_BASE}/scripts/gen_app_partitions.py
+      -e $<TARGET_FILE:app_smem_unaligned_prebuilt>
+      -o ${APP_SMEM_ALIGNED_LD}
+      ${NEWLIB_PART} ${MBEDTLS_PART}
+      $<$<BOOL:${CMAKE_VERBOSE_MAKEFILE}>:--verbose>
+      DEPENDS
+      kernel
+      ${ZEPHYR_LIBS_PROPERTY}
+      app_smem_unaligned_prebuilt
+      WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/
+      COMMENT "Generating app_smem_aligned linker section"
+      )
+  endif()
+
+  ##CONSIDER
+  if(CONFIG_USERSPACE AND CONFIG_ARM)
+    configure_linker_script(
+      linker_priv_stacks.cmd
+      ""
+      ${CODE_RELOCATION_DEP}
+      ${APP_SMEM_ALIGNED_DEP}
+      ${APP_SMEM_ALIGNED_LD}
+      ${OFFSETS_H_TARGET}
+      )
+
+    add_custom_target(
+      linker_priv_stacks_script
+      DEPENDS
+      linker_priv_stacks.cmd
+      )
+
+    set_property(TARGET
+      linker_priv_stacks_script
+      PROPERTY INCLUDE_DIRECTORIES
+      ${ZEPHYR_INCLUDE_DIRS}
+      )
+
+    set(PRIV_STACK_LIB priv_stacks_output_obj_renamed_lib)
+    add_executable(       priv_stacks_prebuilt misc/empty_file.c)
+    target_link_libraries(priv_stacks_prebuilt ${TOPT} ${PROJECT_BINARY_DIR}/linker_priv_stacks.cmd ${zephyr_lnk} ${CODE_RELOCATION_DEP})
+    set_property(TARGET   priv_stacks_prebuilt PROPERTY LINK_DEPENDS ${PROJECT_BINARY_DIR}/linker_priv_stacks.cmd)
+    add_dependencies(     priv_stacks_prebuilt linker_priv_stacks_script ${OFFSETS_LIB})
+  endif()
+endmacro()
+
+
+
 # Load toolchain_ld-family macros
 include(${ZEPHYR_BASE}/cmake/linker/${LINKER}/target_base.cmake)
 include(${ZEPHYR_BASE}/cmake/linker/${LINKER}/target_baremetal.cmake)
