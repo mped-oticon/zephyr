@@ -18,6 +18,28 @@
 #define main(...) zephyr_app_main(__VA_ARGS__)
 #endif
 
+
+#define _ISOC99_SOURCE
+#include <inttypes.h>
+#include <stdio.h>
+#define MYTRACE(e)                          printf("MYTRACE                         %20s:%-4i : %-40s %s\n",                __FILE__, __LINE__, __FUNCTION__, #e)
+#define MYTRACE_SCALAR_U8(e)                printf("MYTRACE_SCALAR_U8               %20s:%-4i : %-40s <%s> %" PRIu8 "\n",   __FILE__, __LINE__, __FUNCTION__, #e, e )
+#define MYTRACE_SCALAR_S8(e)                printf("MYTRACE_SCALAR_S8               %20s:%-4i : %-40s <%s> %" PRId8 "\n",   __FILE__, __LINE__, __FUNCTION__, #e, e )
+#define MYTRACE_SCALAR_U16(e)               printf("MYTRACE_SCALAR_U16              %20s:%-4i : %-40s <%s> %" PRIu16 "\n",  __FILE__, __LINE__, __FUNCTION__, #e, e )
+#define MYTRACE_SCALAR_S16(e)               printf("MYTRACE_SCALAR_S16              %20s:%-4i : %-40s <%s> %" PRId16 "\n",  __FILE__, __LINE__, __FUNCTION__, #e, e )
+#define MYTRACE_SCALAR_U32(e)               printf("MYTRACE_SCALAR_U32              %20s:%-4i : %-40s <%s> %" PRIu32 "\n",  __FILE__, __LINE__, __FUNCTION__, #e, e )
+#define MYTRACE_SCALAR_S32(e)               printf("MYTRACE_SCALAR_S32              %20s:%-4i : %-40s <%s> %" PRId32 "\n",  __FILE__, __LINE__, __FUNCTION__, #e, e )
+#define MYTRACE_SCALAR_U64(e)               printf("MYTRACE_SCALAR_U64              %20s:%-4i : %-40s <%s> %" PRIu64 "\n",  __FILE__, __LINE__, __FUNCTION__, #e, e )
+#define MYTRACE_SCALAR_S64(e)               printf("MYTRACE_SCALAR_S64              %20s:%-4i : %-40s <%s> %" PRId64 "\n",  __FILE__, __LINE__, __FUNCTION__, #e, e )
+#define MYTRACE_ELSE_ENTER(e)               printf("MYTRACE_ELSE_ENTER              %20s:%-4i : %-40s %s\n",                __FILE__, __LINE__, __FUNCTION__, #e)
+#define MYTRACE_RETURN_VAL_UNKNOWN_TYPE(e)  printf("MYTRACE_RETURN_VAL_UNKNOWN_TYPE %20s:%-4i : %-40s %s\n",                __FILE__, __LINE__, __FUNCTION__, #e)
+#define MYTRACE_THEN_ENTER(e)               printf("MYTRACE_THEN_ENTER              %20s:%-4i : %-40s %s\n",                __FILE__, __LINE__, __FUNCTION__, #e)
+#define MYTRACE_CASE()                      printf("MYTRACE_CASE                    %20s:%-4i : %-40s \n",                  __FILE__, __LINE__, __FUNCTION__ )
+#define MYTRACE_ELSE_LEAVE()                printf("MYTRACE_ELSE_LEAVE              %20s:%-4i : %-40s \n",                  __FILE__, __LINE__, __FUNCTION__ )
+#define MYTRACE_THEN_LEAVE()                printf("MYTRACE_THEN_LEAVE              %20s:%-4i : %-40s \n",                  __FILE__, __LINE__, __FUNCTION__ )
+#define MYTRACE_RETURN_VOID()               printf("MYTRACE_RETURN_VOID             %20s:%-4i : %-40s \n",                  __FILE__, __LINE__, __FUNCTION__ )
+
+
 /* For the include/posix/pthreads.h provided with Zephyr,
  * in case somebody would use it, we rename all symbols here adding
  * some prefix, and we ensure this header is included
